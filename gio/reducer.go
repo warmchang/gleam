@@ -44,6 +44,9 @@ func (runner *gleamRunner) doProcessReducer(f Reducer) (err error) {
 
 		keys := row.K
 		lastKeys, err = reduce(f, lastKeys, keys)
+		if err != nil {
+			return fmt.Errorf("process reducer error: %w", err)
+		}
 		if row.T > lastTs {
 			lastTs = row.T
 		}
@@ -87,6 +90,9 @@ func (runner *gleamRunner) doProcessReducerByKeys(f Reducer, keyPositions []int)
 		x := util.Compare(lastKeys, keys)
 		if x == 0 {
 			lastValues, err = reduce(f, lastValues, values)
+			if err != nil {
+				return fmt.Errorf("process reducer by keys error: %w", err)
+			}
 		} else {
 			TsEmitKV(lastTs, lastKeys, lastValues)
 			lastKeys, lastValues = keys, values
