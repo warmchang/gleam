@@ -16,7 +16,6 @@ package plan
 import (
 	"strings"
 
-	"github.com/juju/errors"
 	"github.com/chrislusf/gleam/sql/ast"
 	"github.com/chrislusf/gleam/sql/context"
 	"github.com/chrislusf/gleam/sql/expression"
@@ -26,6 +25,7 @@ import (
 	"github.com/chrislusf/gleam/sql/parser/opcode"
 	"github.com/chrislusf/gleam/sql/sessionctx/varsutil"
 	"github.com/chrislusf/gleam/sql/util/types"
+	"github.com/juju/errors"
 )
 
 // EvalSubquery evaluates incorrelated subqueries once.
@@ -453,6 +453,10 @@ func (er *expressionRewriter) handleExistSubquery(v *ast.ExistsSubqueryExpr) (as
 		er.ctxStack = append(er.ctxStack, er.p.GetSchema().Columns[er.p.GetSchema().Len()-1])
 	} else {
 		physicalPlan, err := doOptimize(np, er.b.ctx, er.b.allocator)
+		if err != nil {
+			er.err = errors.Trace(err)
+			return v, true
+		}
 		d, err := EvalSubquery(physicalPlan, er.b.is, er.b.ctx)
 		if err != nil {
 			er.err = errors.Trace(err)

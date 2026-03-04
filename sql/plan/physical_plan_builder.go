@@ -624,6 +624,9 @@ func (p *Aggregation) convert2PhysicalPlan(prop *requiredProperty) (*physicalPla
 		}
 	}
 	streamInfo, err := p.convert2PhysicalPlanStream(removeLimit(prop))
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
 	if planInfo == nil || streamInfo.cost < planInfo.cost {
 		planInfo = streamInfo
 	}
