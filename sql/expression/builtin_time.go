@@ -24,12 +24,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/juju/errors"
 	"github.com/chrislusf/gleam/sql/ast"
 	"github.com/chrislusf/gleam/sql/context"
 	"github.com/chrislusf/gleam/sql/mysql"
 	"github.com/chrislusf/gleam/sql/sessionctx/variable"
 	"github.com/chrislusf/gleam/sql/util/types"
+	"github.com/juju/errors"
 )
 
 var (
@@ -316,6 +316,9 @@ func (b *builtinFromDaysSig) eval(row []types.Datum) (types.Datum, error) {
 // See https://dev.mysql.com/doc/refman/5.7/en/date-and-time-functions.html#function_from-days
 func builtinFromDays(args []types.Datum, ctx context.Context) (d types.Datum, err error) {
 	days, err := args[0].ToInt64(ctx.GetSessionVars().StmtCtx)
+	if err != nil {
+		return d, err
+	}
 	d.SetMysqlTime(types.TimeFromDays(days))
 	return d, nil
 }
